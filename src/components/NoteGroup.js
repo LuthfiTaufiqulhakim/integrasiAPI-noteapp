@@ -1,5 +1,5 @@
 import { getLocalStorage } from '../utils.js';
-class NoteGroup extends HTMLElement {
+export class NoteGroup extends HTMLElement {
   constructor() {
     super();
 
@@ -22,10 +22,15 @@ class NoteGroup extends HTMLElement {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === 'count') {
-      this.notesData = getLocalStorage('notesData');
-      this.render();
+      this.update(); // Panggil metode update setiap kali atribut 'count' berubah
     }
   }
+
+  update() {
+    this.notesData = getLocalStorage('notesData'); // Perbarui data catatan
+    this.render(); // Render ulang elemen NoteGroup
+  }
+
 
   rendernotesData(notesData, group) {
     let isarchived = group === 'archived';
@@ -43,6 +48,8 @@ class NoteGroup extends HTMLElement {
 
     return content;
   };
+
+  
 
   render() {
     if (!parseInt(this.count)) return this.root.innerHTML = '';

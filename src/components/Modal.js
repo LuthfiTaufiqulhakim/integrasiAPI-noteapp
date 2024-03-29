@@ -4,6 +4,7 @@ import {
   randomId,
   getCallback,
 } from "../utils.js";
+import { NoteGroup } from "./NoteGroup.js";
 
 class Modal extends HTMLElement {
   constructor() {
@@ -74,36 +75,100 @@ class Modal extends HTMLElement {
     this.hideOverlayCallback();
   }
 
+  // handleConfirmButtonClick() {
+  //   this.titleInput = this.root.querySelector("#title");
+  //   this.textarea = this.root.querySelector("#textarea");
+  //   this.checkbox = this.root.querySelector(".checkbox");
+
+  //   let newNote = {
+  //     // id: randomId(),
+  //     title: this.titleInput.value,
+  //     body: this.textarea.value,
+  //     // archived: this.checkbox.checked.toString(),
+  //   };
+
+  //   let catchNotes;
+
+  //   let existingNotes = getLocalStorage("notesData") || [];
+  //   fetch(`https://notes-api.dicoding.dev/v2/notes`, {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(newNote)
+    
+  //   })
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       catchNotes = data.data || {};
+  //       console.log("Note archived:", data);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error archiving note:", error);
+  //     });
+  //     console.log(catchNotes, existingNotes)
+  //   existingNotes.push(catchNotes);
+  //   // Store the updated notes back into local storage
+  //   setLocalStorage(existingNotes);
+
+  //   // Call the callback function to update note groups
+  //   this.updateNoteGroupsCallback(existingNotes);
+
+  //   // Close the modal
+  //   this.open = "false";
+
+  //   // Hide the overlay
+  //   this.hideOverlayCallback();
+  // }
+
   handleConfirmButtonClick() {
     this.titleInput = this.root.querySelector("#title");
     this.textarea = this.root.querySelector("#textarea");
     this.checkbox = this.root.querySelector(".checkbox");
 
     let newNote = {
-      id: randomId(),
       title: this.titleInput.value,
       body: this.textarea.value,
-      archived: this.checkbox.checked.toString(),
     };
 
-    // Retrieve existing notes from local storage or initialize as an empty array
     let existingNotes = getLocalStorage("notesData") || [];
+    fetch(`https://notes-api.dicoding.dev/v2/notes`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newNote)
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        let catchNotes = data.data || {};
+        console.log("Note archived:", data);
+        existingNotes.push(catchNotes);
+        // Store the updated notes back into local storage
+        setLocalStorage(existingNotes);
+         // Call the callback function to update note groups
+       this.updateNoteGroupsCallback(existingNotes);
+       
+       
+      })
+      .catch((error) => {
+        console.error("Error archiving note:", error);
+      });
 
-    // Push the new note to the existing notes
-    existingNotes.push(newNote);
+      
 
-    // Store the updated notes back into local storage
-    setLocalStorage(existingNotes);
+       // Close the modal
+       this.open = "false";
 
-    // Call the callback function to update note groups
-    this.updateNoteGroupsCallback(existingNotes);
+       // Hide the overlay
+       this.hideOverlayCallback();
+       
+       let updateNewNote = new NoteGroup ()
+       
+      updateNewNote.update()
 
-    // Close the modal
-    this.open = "false";
-
-    // Hide the overlay
-    this.hideOverlayCallback();
   }
+
 
   render() {
     if (this.open !== "true") return (this.root.innerHTML = "");
