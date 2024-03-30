@@ -4,7 +4,6 @@ import {
   randomId,
   getCallback,
 } from "../utils.js";
-import { NoteGroup } from "./NoteGroup.js";
 
 class Modal extends HTMLElement {
   constructor() {
@@ -75,98 +74,53 @@ class Modal extends HTMLElement {
     this.hideOverlayCallback();
   }
 
-  // handleConfirmButtonClick() {
-  //   this.titleInput = this.root.querySelector("#title");
-  //   this.textarea = this.root.querySelector("#textarea");
-  //   this.checkbox = this.root.querySelector(".checkbox");
-
-  //   let newNote = {
-  //     // id: randomId(),
-  //     title: this.titleInput.value,
-  //     body: this.textarea.value,
-  //     // archived: this.checkbox.checked.toString(),
-  //   };
-
-  //   let catchNotes;
-
-  //   let existingNotes = getLocalStorage("notesData") || [];
-  //   fetch(`https://notes-api.dicoding.dev/v2/notes`, {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify(newNote)
-    
-  //   })
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       catchNotes = data.data || {};
-  //       console.log("Note archived:", data);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error archiving note:", error);
-  //     });
-  //     console.log(catchNotes, existingNotes)
-  //   existingNotes.push(catchNotes);
-  //   // Store the updated notes back into local storage
-  //   setLocalStorage(existingNotes);
-
-  //   // Call the callback function to update note groups
-  //   this.updateNoteGroupsCallback(existingNotes);
-
-  //   // Close the modal
-  //   this.open = "false";
-
-  //   // Hide the overlay
-  //   this.hideOverlayCallback();
-  // }
-
   handleConfirmButtonClick() {
     this.titleInput = this.root.querySelector("#title");
     this.textarea = this.root.querySelector("#textarea");
     this.checkbox = this.root.querySelector(".checkbox");
 
-    let newNote = {
-      title: this.titleInput.value,
-      body: this.textarea.value,
-    };
-
-    let existingNotes = getLocalStorage("notesData") || [];
-    fetch(`https://notes-api.dicoding.dev/v2/notes`, {
+    // Kirim data menggunakan fetch POST
+    fetch("https://notes-api.dicoding.dev/v2/notes", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(newNote)
+      body: JSON.stringify({
+        // id: randomId(),
+        title: this.titleInput.value,
+        body: this.textarea.value,
+        // archived: this.checkbox.checked.toString(),
+      }),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(
+            "Server returned " + response.status + " " + response.statusText
+          );
+        }
+        return response.json();
+      })
       .then((data) => {
-        let catchNotes = data.data || {};
-        console.log("Note archived:", data);
-        existingNotes.push(catchNotes);
-        setLocalStorage(existingNotes);
-       this.updateNoteGroupsCallback(existingNotes);
        
-       
+        console.log("Note added successfully:", data);
+
+        this.notes = getLocalStorage("notesData");
+        this.notes.push({
+          id: randomId(),
+          title: this.titleInput.value,
+          body: this.textarea.value,
+          archived: this.checkbox.checked.toString(),
+        });
+        setLocalStorage(this.notes);
+
+        this.updateNoteGroupsCallback(this.notes);
+        this.open = "false";
+        this.hideOverlayCallback();
       })
       .catch((error) => {
-        console.error("Error archiving note:", error);
+        console.error("Error adding note:", error);
       });
-
-      
-
-       // Close the modal
-       this.open = "false";
-
-       // Hide the overlay
-       this.hideOverlayCallback();
-       
-       let updateNewNote = new NoteGroup ()
-       
-      updateNewNote.update()
-
   }
-
 
   render() {
     if (this.open !== "true") return (this.root.innerHTML = "");
@@ -284,7 +238,7 @@ class Modal extends HTMLElement {
         <dialog class="dialog" id="dialog-rounded" open="">
           <div class="dialog-message">
             <div class="balloon">
-              <p>Write down your notesData or grievances here!</p>
+              <p>Write down your notes or grievances here!</p>
             </div>
           </div>
 

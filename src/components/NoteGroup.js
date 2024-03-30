@@ -1,10 +1,10 @@
 import { getLocalStorage } from '../utils.js';
-export class NoteGroup extends HTMLElement {
+class NoteGroup extends HTMLElement {
   constructor() {
     super();
 
     this.root = this.attachShadow({ mode: 'open' });
-    this.notesData = getLocalStorage('notesData');
+    this.notes = getLocalStorage('notesData');
     this.render();
   }
 
@@ -22,22 +22,17 @@ export class NoteGroup extends HTMLElement {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === 'count') {
-      this.update(); // Panggil metode update setiap kali atribut 'count' berubah
+      this.notes = getLocalStorage('notesData');
+      this.render();
     }
   }
 
-  update() {
-    this.notesData = getLocalStorage('notesData'); // Perbarui data catatan
-    this.render(); // Render ulang elemen NoteGroup
-  }
-
-
-  rendernotesData(notesData, group) {
+  renderNotes(notes, group) {
     let isarchived = group === 'archived';
-    let filterednotesData = notesData.filter(note => note.archived === isarchived.toString());
+    let filteredNotes = notes.filter(note => note.archived === isarchived.toString());
     let content = '';
 
-    for (let note of filterednotesData) {
+    for (let note of filteredNotes) {
       content += `
         <c-note id="${note.id}" archived="${note.archived}" update-note-groups="updateNoteGroups">
           <h3 slot="title">${note.title}</h3>
@@ -48,8 +43,6 @@ export class NoteGroup extends HTMLElement {
 
     return content;
   };
-
-  
 
   render() {
     if (!parseInt(this.count)) return this.root.innerHTML = '';
@@ -78,7 +71,7 @@ export class NoteGroup extends HTMLElement {
           <container-badge type="${this.group}"></container-badge>
         </a>
         <div class="note-group">
-          ${this.rendernotesData(this.notesData, this.group)}
+          ${this.renderNotes(this.notes, this.group)}
         </div>
       </section>
       `;
