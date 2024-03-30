@@ -92,7 +92,7 @@ class Note extends HTMLElement {
       .catch((error) => {
         console.error("Error archiving note:", error);
         this.root.removeChild(loadingDiv);
-        // Handle error, misalnya menampilkan pesan error kepada pengguna
+        
       });
   }
 
@@ -112,7 +112,6 @@ class Note extends HTMLElement {
       })
       .catch((error) => {
         console.error("Error unarchiving note:", error);
-        // Handle error, misalnya menampilkan pesan error kepada pengguna
         this.root.removeChild(loadingDiv);
 
       });
@@ -139,7 +138,6 @@ class Note extends HTMLElement {
       })
       .catch((error) => {
         console.error("Error deleting note:", error);
-        // Handle error, misalnya menampilkan pesan error kepada pengguna
         this.root.removeChild(loadingDiv);
 
       });
@@ -154,7 +152,7 @@ class Note extends HTMLElement {
 
     this.unarchivedButtons.forEach((unarchivedButton) => {
       unarchivedButton.addEventListener("click", (e) => {
-        this.handleUnarchivedButtonClick(e); // Tambahkan pemanggilan handleUnarchivedButtonClick
+        this.handleUnarchivedButtonClick(e); 
       });
     });
 
