@@ -144,9 +144,7 @@ class Modal extends HTMLElement {
         let catchNotes = data.data || {};
         console.log("Note archived:", data);
         existingNotes.push(catchNotes);
-        // Store the updated notes back into local storage
         setLocalStorage(existingNotes);
-         // Call the callback function to update note groups
        this.updateNoteGroupsCallback(existingNotes);
        
        
