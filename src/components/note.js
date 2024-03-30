@@ -77,6 +77,9 @@ class Note extends HTMLElement {
   };
 
   handleArchivedButtonClick() {
+    const loadingDiv = document.createElement("div");
+    loadingDiv.innerText = "Loading...";
+    this.root.appendChild(loadingDiv);
     fetch(`https://notes-api.dicoding.dev/v2/notes/${this.id}/archive`, {
       method: "POST",
     })
@@ -84,15 +87,19 @@ class Note extends HTMLElement {
       .then((data) => {
         console.log("Note archived:", data);
         this.archived = "true";
-        
-
+        this.root.removeChild(loadingDiv);
       })
       .catch((error) => {
         console.error("Error archiving note:", error);
+        this.root.removeChild(loadingDiv);
+        // Handle error, misalnya menampilkan pesan error kepada pengguna
       });
   }
 
   handleUnarchivedButtonClick() {
+    const loadingDiv = document.createElement("div");
+    loadingDiv.innerText = "Loading...";
+    this.root.appendChild(loadingDiv);
     fetch(`https://notes-api.dicoding.dev/v2/notes/${this.id}/unarchive`, {
       method: "POST",
     })
@@ -100,13 +107,21 @@ class Note extends HTMLElement {
       .then((data) => {
         console.log("Note unarchived:", data);
         this.archived = "false";
+        this.root.removeChild(loadingDiv);
+
       })
       .catch((error) => {
         console.error("Error unarchiving note:", error);
+        // Handle error, misalnya menampilkan pesan error kepada pengguna
+        this.root.removeChild(loadingDiv);
+
       });
   }
 
   handleDeleteButtonClick() {
+    const loadingDiv = document.createElement("div");
+    loadingDiv.innerText = "Loading...";
+    this.root.appendChild(loadingDiv);
     fetch(`https://notes-api.dicoding.dev/v2/notes/${this.id}`, {
       method: "DELETE",
     })
@@ -119,9 +134,14 @@ class Note extends HTMLElement {
         this.notesData.splice(noteIndex, 1);
         setLocalStorage(this.notesData);
         this.updateNoteGroupsCallback(this.notesData);
+        this.root.removeChild(loadingDiv);
+
       })
       .catch((error) => {
         console.error("Error deleting note:", error);
+        // Handle error, misalnya menampilkan pesan error kepada pengguna
+        this.root.removeChild(loadingDiv);
+
       });
   }
 
@@ -134,7 +154,7 @@ class Note extends HTMLElement {
 
     this.unarchivedButtons.forEach((unarchivedButton) => {
       unarchivedButton.addEventListener("click", (e) => {
-        this.handleUnarchivedButtonClick(e); 
+        this.handleUnarchivedButtonClick(e); // Tambahkan pemanggilan handleUnarchivedButtonClick
       });
     });
 
@@ -291,6 +311,7 @@ class Note extends HTMLElement {
           <button type="button" class="success">Archived</button>
           <button type="button" class="unarchived">Unarchived</button>
           <button type="button" class="error">Delete</button>
+          
         </div>
       </div>
     `;
